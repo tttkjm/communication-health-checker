@@ -53,9 +53,20 @@ uv run ruff format src/ apps/ tests/
 ## ビルド（配布バイナリ）
 
 ```bash
-bash scripts/build_app.sh                   # フロントビルド → 依存解決 → PyInstaller
+bash scripts/build_app.sh                   # 同梱 statics/ を使用 → 依存解決 → PyInstaller
 # => dist/communication_health_checker(.exe)
 ```
+
+標準では、このリポジトリに同梱済みの `statics/`（ビルド済み SPA）をそのまま使い、フロントエンドの再ビルドはしません。フロントエンドのソースから SPA を作り直したい場合のみ、再ビルドを有効化します:
+
+```bash
+bash scripts/build_app.sh --rebuild-frontend            # = REBUILD_FRONTEND=1
+# フロントエンドのソースが別の場所にある場合:
+FRONTEND_DIR=../path/to/frontend bash scripts/build_app.sh --rebuild-frontend
+```
+
+- `--rebuild-frontend` / `-r`: フロントエンド（既定 `../sample-gui-frontend`）を `npm` でビルドして `statics/` を更新する。`REBUILD_FRONTEND=1` でも同じ。
+- `FRONTEND_DIR`: フロントエンドのソースリポジトリのパス（既定 `../sample-gui-frontend`）。
 
 > ローカル localhost を社内プロキシが横取りする環境では、ブラウザの localhost バイパス設定／`NO_PROXY=127.0.0.1,localhost` を確認すること。
 

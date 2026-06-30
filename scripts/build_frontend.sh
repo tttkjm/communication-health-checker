@@ -1,25 +1,36 @@
 #!/usr/bin/env bash
-# SPA をビルドして statics/ へ出力する。
-# フロントエンドのソースは別リポジトリ ($FRONTEND_DIR、既定 ../sample-gui-frontend)。
-# ソースが無い場合は、本リポジトリに同梱済みの statics/ をそのまま使ってビルドを続行する。
+# SPA を statics/ に用意する。
+#
+# 標準動作: 本リポジトリに同梱済みの statics/（ビルド済み SPA）をそのまま使い、再ビルドしない。
+# 再ビルド  : REBUILD_FRONTEND=1 のときのみ、フロントエンドのソース
+#             ($FRONTEND_DIR、既定 ../sample-gui-frontend) を npm でビルドする。
 set -euo pipefail
 
 FRONTEND_DIR="${FRONTEND_DIR:-../sample-gui-frontend}"
+REBUILD_FRONTEND="${REBUILD_FRONTEND:-0}"
 
 cd "$(dirname "$0")/.."
 
-if [ ! -d "$FRONTEND_DIR" ]; then
+if [ "$REBUILD_FRONTEND" != "1" ]; then
+  # --- 標準動作: 同梱の statics/ を使用 ---
   if [ -f statics/index.html ]; then
-    echo "フロントエンドリポジトリ ($FRONTEND_DIR) が見つかりません。"
-    echo "同梱済みの statics/ を使用してビルドを続行します。"
-    echo "（最新の SPA を取り込む場合は FRONTEND_DIR でパスを指定してください）"
+    echo "同梱済みの statics/ を使用します（フロントエンドの再ビルドはスキップ）。"
+    echo "再ビルドする場合は REBUILD_FRONTEND=1 を指定してください。"
     exit 0
   fi
-  echo "エラー: フロントエンドリポジトリ ($FRONTEND_DIR) が無く、同梱の statics/ もありません。" >&2
+  echo "エラー: 同梱の statics/ が見つかりません。" >&2
+  echo "REBUILD_FRONTEND=1 でフロントエンドを再ビルドするか、statics/ を用意してください。" >&2
+  exit 1
+fi
+
+# --- 再ビルド: フロントエンドのソースから npm ビルド ---
+if [ ! -d "$FRONTEND_DIR" ]; then
+  echo "エラー: フロントエンドリポジトリ ($FRONTEND_DIR) が見つかりません。" >&2
   echo "FRONTEND_DIR 環境変数でフロントエンドのパスを指定してください。" >&2
   exit 1
 fi
 
+echo "フロントエンドを再ビルドします: $FRONTEND_DIR"
 cd "$FRONTEND_DIR"
 
 if [ -d node_modules ]; then

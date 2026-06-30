@@ -1,11 +1,37 @@
 #!/usr/bin/env bash
-# フロントビルド → 依存解決 → PyInstaller でシングルバイナリ生成。
+# フロント準備 → 依存解決 → PyInstaller でシングルバイナリ生成。
 # 生成物: dist/communication_health_checker (Windows では dist/communication_health_checker.exe)
+#
+# 標準動作: 同梱済みの statics/ をそのまま使う（フロントエンドの再ビルドはしない）。
+# オプション:
+#   --rebuild-frontend, -r   フロントエンドのソースから SPA を再ビルドする
+#                            （= REBUILD_FRONTEND=1。ソースは FRONTEND_DIR、既定 ../sample-gui-frontend）
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-echo "==> 1/3 フロントエンドをビルド"
+REBUILD_FRONTEND="${REBUILD_FRONTEND:-0}"
+for arg in "$@"; do
+  case "$arg" in
+    --rebuild-frontend|-r) REBUILD_FRONTEND=1 ;;
+    -h|--help)
+      echo "Usage: bash scripts/build_app.sh [--rebuild-frontend|-r]"
+      exit 0
+      ;;
+    *)
+      echo "不明な引数: $arg" >&2
+      echo "Usage: bash scripts/build_app.sh [--rebuild-frontend|-r]" >&2
+      exit 2
+      ;;
+  esac
+done
+export REBUILD_FRONTEND
+
+if [ "$REBUILD_FRONTEND" = "1" ]; then
+  echo "==> 1/3 フロントエンドを再ビルド"
+else
+  echo "==> 1/3 フロントエンド（同梱の statics/ を使用）"
+fi
 bash scripts/build_frontend.sh
 
 echo "==> 2/3 バックエンド依存を解決"
