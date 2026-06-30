@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+*.egg
+
+# ---- 仮想環境 ----
+.venv/
+venv/
+env/
+.python-version
+
+# ---- テスト / 静的解析キャッシュ ----
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# ---- PyInstaller ビルド成果物 ----
+# communication_health_checker.spec は追跡対象（無視しない）
+build/
+dist/
+*.manifest
+
+# ---- アプリ実行時データ（SQLite 等）----
+*.db
+*.sqlite
+*.sqlite3
+.communication_health_checker/
+
+# ---- フロントエンド（参考: SPA ソースは別リポジトリ）----
+node_modules/
+
+# ---- 環境変数 ----
+.env
+.env.*
+!.env.example
+
+# ---- エディタ / IDE ----
+.vscode/
+.idea/
+*.swp
+*~
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

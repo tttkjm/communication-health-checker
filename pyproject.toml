@@ -1,0 +1,44 @@
+[project]
+name = "communication_health_checker"
+version = "0.1.0"
+description = "Parallel ping monitor for network engineers"
+requires-python = ">=3.14"
+dependencies = [
+    "injector>=0.22.0",
+    "pydantic>=2.11",
+]
+
+[project.optional-dependencies]
+desktop = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]
+build = ["pyinstaller>=6.0"]
+dev = ["ruff>=0.9"]
+test = ["pytest>=8", "httpx>=0.27"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/communication_health_checker"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+markers = [
+    "smoke: ハッピーパス",
+    "critical: 必須経路",
+    "slow: 重いテスト（バイナリ起動等）",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+src = ["src", "apps", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = [
+    "B008",   # FastAPI の Depends() を引数デフォルトに置くのは慣用句
+    "UP046",  # Generic[TId] 継承（Pydantic ジェネリック互換のため PEP695 を使わない）
+    "UP047",
+]
