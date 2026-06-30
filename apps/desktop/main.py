@@ -106,6 +106,10 @@ def main() -> None:
     instance.write_instance(host, port)
     try:
         server.run()
+    except KeyboardInterrupt:
+        # Ctrl+C。uvicorn は graceful shutdown 後に KeyboardInterrupt を
+        # 再送出するため、ここで握りつぶして Traceback を出さずに終了する。
+        pass
     finally:
         instance.clear_instance()
 
